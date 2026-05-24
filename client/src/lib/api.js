@@ -16,6 +16,14 @@ async function request(method, path, body) {
   });
 
   const data = await res.json().catch(() => ({}));
+
+  // Token references a deleted/unknown user — wipe session and send to login
+  if (res.status === 401) {
+    localStorage.removeItem('tab_token');
+    window.location.replace('/welcome');
+    throw new Error(data.error || 'Session expired');
+  }
+
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }

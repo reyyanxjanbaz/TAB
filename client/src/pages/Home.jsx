@@ -122,7 +122,7 @@ export default function Home() {
             <p className="text-stone-500 text-sm mb-8 max-w-xs">
               Create a group with your friends, flatmates, or office team to start ordering together.
             </p>
-            <Button onClick={() => setShowCreate(true)} size="lg">
+            <Button onClick={() => { setShowCreate(true); setFormError(''); }} size="lg">
               Create your first group
             </Button>
           </div>
