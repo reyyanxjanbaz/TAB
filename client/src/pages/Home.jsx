@@ -7,7 +7,7 @@ import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { Avatar } from '../components/Avatar';
 import { timeAgo } from '../lib/utils';
-import { requestPushPermission } from '../lib/push';
+import { requestPushPermission, promptPushPermission } from '../lib/push';
 
 const FOOD_EMOJIS = ['🍔', '🍕', '🌮', '🍜', '🥗', '☕', '🍱', '🧆', '🌯', '🍣'];
 
@@ -18,16 +18,23 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [groupEmoji, setGroupEmoji] = useState('🍔');
   const [inviteCode, setInviteCode] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
   const [formError, setFormError] = useState('');
+  const [pushStatus, setPushStatus] = useState(() => {
+    if (!('Notification' in window)) return 'unsupported';
+    return Notification.permission; // 'default' | 'granted' | 'denied'
+  });
 
   useEffect(() => {
     loadGroups();
-    requestPushPermission();
+    requestPushPermission().then(() => {
+      if ('Notification' in window) setPushStatus(Notification.permission);
+    });
   }, []);
 
   async function loadGroups() {
@@ -86,8 +93,20 @@ export default function Home() {
             <h1 className="text-2xl font-black text-stone-900">TAB</h1>
             <p className="text-stone-500 text-sm">Hey, {user?.username} 👋</p>
           </div>
-          <Avatar user={user} size="md" />
+          <button onClick={() => setShowUserMenu(true)} className="active:opacity-70 rounded-full">
+            <Avatar user={user} size="md" />
+          </button>
         </div>
+        {pushStatus === 'default' && (
+          <button
+            onClick={() => promptPushPermission().then(() => setPushStatus(Notification.permission))}
+            className="mt-3 w-full flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-2xl px-4 py-2.5 text-sm text-orange-700 font-medium active:bg-orange-100"
+          >
+            <span>🔔</span>
+            <span className="flex-1 text-left">Enable notifications to get order alerts</span>
+            <span className="text-orange-400">→</span>
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -192,6 +211,41 @@ export default function Home() {
             Join Group
           </Button>
         </form>
+      </Modal>
+
+      {/* User menu modal */}
+      <Modal open={showUserMenu} onClose={() => setShowUserMenu(false)}>
+        <div className="flex flex-col gap-3 pt-2 pb-1">
+          <div className="flex items-center gap-3 pb-3 border-b border-stone-100">
+            <Avatar user={user} size="md" />
+            <div>
+              <p className="font-semibold text-stone-900">{user?.username}</p>
+              <p className="text-sm text-stone-400">{user?.email}</p>
+            </div>
+          </div>
+          {pushStatus === 'default' && (
+            <button
+              onClick={() => promptPushPermission().then(() => { setPushStatus(Notification.permission); setShowUserMenu(false); })}
+              className="flex items-center gap-3 py-3 text-stone-700 font-medium text-sm"
+            >
+              <span className="text-xl">🔔</span>
+              Enable notifications
+            </button>
+          )}
+          {pushStatus === 'granted' && (
+            <div className="flex items-center gap-3 py-3 text-green-600 text-sm font-medium">
+              <span className="text-xl">🔔</span>
+              Notifications enabled
+            </div>
+          )}
+          <button
+            onClick={() => { setShowUserMenu(false); logout(); }}
+            className="flex items-center gap-3 py-3 text-red-500 font-semibold text-sm"
+          >
+            <span className="text-xl">→</span>
+            Log out
+          </button>
+        </div>
       </Modal>
     </div>
   );

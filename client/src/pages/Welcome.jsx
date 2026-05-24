@@ -46,8 +46,8 @@ export default function Welcome() {
 
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-200">
-            <span className="text-4xl">🍔</span>
+          <div className="w-20 h-20 mx-auto mb-4">
+            <img src="/icons/icon-192.svg" alt="TAB" className="w-full h-full drop-shadow-lg" />
           </div>
           <h1 className="text-4xl font-black text-stone-900 tracking-tight">TAB</h1>
           <p className="text-stone-500 mt-1.5 text-base">Group orders, made effortless.</p>

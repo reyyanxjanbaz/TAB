@@ -95,6 +95,41 @@ router.get('/:id', (req, res) => {
   res.json({ group, members, sessions, my_role: member.role });
 });
 
+// Update group (admin only)
+router.put('/:id', (req, res) => {
+  const db = getDB();
+  const member = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  if (!member || member.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+
+  const group = db.prepare('SELECT * FROM groups WHERE id = ?').get(req.params.id);
+  if (!group) return res.status(404).json({ error: 'Group not found' });
+
+  const { name, icon_emoji } = req.body;
+  if (name !== undefined && !name?.trim()) return res.status(400).json({ error: 'Name cannot be empty' });
+
+  db.prepare('UPDATE groups SET name = ?, icon_emoji = ? WHERE id = ?').run(
+    name?.trim() || group.name,
+    icon_emoji || group.icon_emoji,
+    req.params.id
+  );
+  const updated = db.prepare('SELECT * FROM groups WHERE id = ?').get(req.params.id);
+  res.json({ group: updated });
+});
+
+// Kick member (admin only)
+router.delete('/:id/members/:userId', (req, res) => {
+  const db = getDB();
+  const member = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  if (!member || member.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (req.params.userId === req.user.id) return res.status(400).json({ error: 'Cannot remove yourself' });
+
+  const target = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.params.userId);
+  if (!target) return res.status(404).json({ error: 'Member not found' });
+
+  db.prepare('DELETE FROM group_members WHERE group_id = ? AND user_id = ?').run(req.params.id, req.params.userId);
+  res.json({ ok: true });
+});
+
 // Create order session
 router.post('/:id/sessions', (req, res) => {
   const db = getDB();

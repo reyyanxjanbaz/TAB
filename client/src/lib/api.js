@@ -36,6 +36,8 @@ export const api = {
   createGroup: (body) => request('POST', '/groups', body),
   joinGroup: (invite_code) => request('POST', '/groups/join', { invite_code }),
   getGroup: (id) => request('GET', `/groups/${id}`),
+  updateGroup: (id, body) => request('PUT', `/groups/${id}`, body),
+  kickMember: (groupId, userId) => request('DELETE', `/groups/${groupId}/members/${userId}`),
   createSession: (groupId) => request('POST', `/groups/${groupId}/sessions`),
 
   // Sessions

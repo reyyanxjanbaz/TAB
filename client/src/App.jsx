@@ -25,7 +25,7 @@ export default function App() {
     <div className="min-h-screen flex items-center justify-center bg-orange-50">
       <div className="text-center">
         <div className="w-16 h-16 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-          <span className="text-3xl">🍔</span>
+          <img src="/icons/icon-192.svg" alt="TAB" className="w-10 h-10" />
         </div>
         <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin mx-auto" />
       </div>

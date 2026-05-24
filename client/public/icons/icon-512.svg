@@ -1,6 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
-  <rect width="512" height="512" rx="113" fill="#f97316"/>
-  <text x="50%" y="58%" font-size="256"
-        text-anchor="middle" dominant-baseline="middle"
-        font-family="sans-serif">🍔</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="512" height="512">
+  <!-- Orange rounded background -->
+  <rect width="192" height="192" rx="42" fill="#f97316"/>
+
+  <!-- Steam wisps -->
+  <path d="M76 52 Q 80 43 76 34" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <path d="M96 52 Q 100 43 96 34" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <path d="M116 52 Q 112 43 116 34" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Cup rim (wide white pill) -->
+  <rect x="44" y="58" width="104" height="20" rx="10" fill="white"/>
+
+  <!-- Cup body sides -->
+  <path d="M52 78 L66 151 L126 151 L140 78"
+        fill="none" stroke="white" stroke-width="8"
+        stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Cup bottom -->
+  <line x1="66" y1="151" x2="126" y2="151"
+        stroke="white" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Sleeve band -->
+  <line x1="59" y1="110" x2="133" y2="110"
+        stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
 </svg>
