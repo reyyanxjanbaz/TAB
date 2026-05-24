@@ -83,6 +83,10 @@ export default function OrderSetup() {
 
   async function startOrder() {
     if (!items.length) return alert('Add at least one item');
+    if (showCustom) {
+      const mins = parseInt(customTimer);
+      if (!mins || mins < 1 || mins > 120) return alert('Enter a timer between 1 and 120 minutes');
+    }
     setStarting(true);
     try {
       const duration = showCustom ? parseInt(customTimer) * 60 : timer;
@@ -96,15 +100,15 @@ export default function OrderSetup() {
   }
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-3 border-orange-400 border-t-transparent rounded-full animate-spin" />
+    return <div className="h-[100dvh] flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col max-w-lg mx-auto">
+    <div className="h-[100dvh] bg-stone-50 flex flex-col max-w-lg mx-auto">
       {/* Header */}
-      <div className="bg-white px-5 pt-12 pb-4 safe-top border-b border-stone-100">
+      <div className="bg-white px-5 pt-12 pb-4 safe-top border-b border-stone-100 flex-shrink-0">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="text-stone-400 text-xl p-1">←</button>
           <div>
@@ -114,7 +118,7 @@ export default function OrderSetup() {
         </div>
       </div>
 
-      <div className="flex-1 px-5 pt-5 pb-36 overflow-y-auto no-scrollbar">
+      <div className="flex-1 px-5 pt-5 pb-4 overflow-y-auto no-scrollbar">
 
         {/* Quick add */}
         <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Quick Add</h2>
@@ -210,7 +214,7 @@ export default function OrderSetup() {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white border-t border-stone-100 px-5 py-4 pb-safe">
+      <div className="flex-shrink-0 bg-white border-t border-stone-100 px-5 py-4 pb-safe">
         <Button
           size="lg"
           onClick={startOrder}

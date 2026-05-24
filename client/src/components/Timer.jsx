@@ -1,26 +1,38 @@
 import { useState, useEffect } from 'react';
-import { formatTimer } from '../lib/utils';
-import { cn } from '../lib/utils';
+import { formatTimer, cn } from '../lib/utils';
 
 export function Timer({ endsAt, onExpire }) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
     if (!endsAt) return;
-    function tick() {
-      const remaining = Math.max(0, Math.ceil((new Date(endsAt) - Date.now()) / 1000));
-      setSeconds(remaining);
-      if (remaining === 0 && onExpire) onExpire();
+    const expiry = new Date(endsAt).getTime();
+
+    function remaining() {
+      return Math.max(0, Math.ceil((expiry - Date.now()) / 1000));
     }
-    tick();
-    const id = setInterval(tick, 1000);
+
+    const initial = remaining();
+    setSeconds(initial);
+    if (initial === 0) {
+      if (onExpire) onExpire();
+      return;
+    }
+
+    const id = setInterval(() => {
+      const left = remaining();
+      setSeconds(left);
+      if (left === 0) {
+        clearInterval(id);
+        if (onExpire) onExpire();
+      }
+    }, 1000);
+
     return () => clearInterval(id);
   }, [endsAt]);
 
   if (!endsAt) return null;
 
-  const total = Math.ceil((new Date(endsAt) - new Date(endsAt).setSeconds(0)) / 1000);
-  const pct = seconds > 0 ? (seconds / (seconds + 1)) : 0; // approximate
   const urgent = seconds <= 30;
 
   return (

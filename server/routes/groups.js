@@ -77,7 +77,7 @@ router.get('/:id', (req, res) => {
   if (!group) return res.status(404).json({ error: 'Group not found' });
 
   const members = db.prepare(`
-    SELECT u.id, u.username, u.email, u.avatar_color, gm.role, gm.joined_at
+    SELECT u.id, u.username, u.avatar_color, gm.role, gm.joined_at
     FROM users u JOIN group_members gm ON u.id = gm.user_id
     WHERE gm.group_id = ?
     ORDER BY gm.joined_at ASC
@@ -101,10 +101,27 @@ router.post('/:id/sessions', (req, res) => {
   const member = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.user.id);
   if (!member) return res.status(403).json({ error: 'Not a member' });
 
+  const existing = db.prepare(
+    "SELECT id FROM order_sessions WHERE group_id = ? AND status IN ('setup', 'active')"
+  ).get(req.params.id);
+  if (existing) return res.status(400).json({ error: 'An order is already in progress' });
+
   const id = uuidv4();
   db.prepare(
     'INSERT INTO order_sessions (id, group_id, created_by, status) VALUES (?, ?, ?, ?)'
   ).run(id, req.params.id, req.user.id, 'setup');
+
+  // Auto-populate items from last closed session
+  const lastSession = db.prepare(
+    "SELECT id FROM order_sessions WHERE group_id = ? AND status = 'closed' ORDER BY closed_at DESC LIMIT 1"
+  ).get(req.params.id);
+  if (lastSession) {
+    const lastItems = db.prepare('SELECT name, price, sort_order FROM session_items WHERE session_id = ?').all(lastSession.id);
+    const insertItem = db.prepare('INSERT INTO session_items (id, session_id, name, price, sort_order) VALUES (?, ?, ?, ?, ?)');
+    for (const item of lastItems) {
+      insertItem.run(uuidv4(), id, item.name, item.price, item.sort_order);
+    }
+  }
 
   const session = db.prepare('SELECT * FROM order_sessions WHERE id = ?').get(id);
   res.status(201).json({ session });

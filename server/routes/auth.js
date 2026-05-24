@@ -22,7 +22,11 @@ router.post('/register', (req, res) => {
   let user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase().trim());
 
   if (user) {
-    // Login existing user
+    // Update username if it changed and re-login
+    if (username.trim() !== user.username) {
+      db.prepare('UPDATE users SET username = ? WHERE id = ?').run(username.trim(), user.id);
+      user = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+    }
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '90d' });
     return res.json({ token, user: sanitize(user) });
   }

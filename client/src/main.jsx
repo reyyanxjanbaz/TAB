@@ -13,10 +13,12 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Handle pending join after login
-const pendingJoin = localStorage.getItem('tab_pending_join');
-if (pendingJoin && window.location.pathname !== `/join/${pendingJoin}`) {
-  localStorage.removeItem('tab_pending_join');
+// Adjust fixed-position elements when soft keyboard opens (iOS Safari)
+if ('visualViewport' in window) {
+  window.visualViewport.addEventListener('resize', () => {
+    const offset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+    document.documentElement.style.setProperty('--keyboard-height', `${offset}px`);
+  });
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

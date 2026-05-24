@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/ui/Button';
-import { formatPrice, timeAgo } from '../lib/utils';
+import { formatPrice } from '../lib/utils';
 
 export default function OrderSummary() {
   const { id } = useParams();
@@ -59,21 +59,22 @@ export default function OrderSummary() {
   }
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-3 border-orange-400 border-t-transparent rounded-full animate-spin" />
+    return <div className="h-[100dvh] flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
     </div>;
   }
 
   if (!data) return null;
+  const groupId = data?.session?.group_id;
   const { session, itemTotals, responses, declined, pending } = data;
   const ordered = responses.filter(r => r.status === 'responded');
   const grandTotal = itemTotals.reduce((sum, i) => sum + (i.price || 0) * i.total_qty, 0);
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col max-w-lg mx-auto">
+    <div className="h-[100dvh] bg-stone-50 flex flex-col max-w-lg mx-auto">
       {/* Header */}
       <div className="bg-white px-5 pt-12 pb-5 safe-top border-b border-stone-100 text-center">
-        <button onClick={() => navigate(-1)} className="absolute left-5 top-12 text-stone-400 text-xl">←</button>
+        <button onClick={() => navigate(`/groups/${groupId}`)} className="absolute left-5 top-12 text-stone-400 text-xl">←</button>
         <div className="text-5xl mb-2">🎉</div>
         <h1 className="text-2xl font-black text-stone-900">Order Closed</h1>
         <p className="text-stone-500 text-sm mt-1">
@@ -81,7 +82,7 @@ export default function OrderSummary() {
         </p>
       </div>
 
-      <div className="flex-1 px-5 pt-5 pb-32 overflow-y-auto no-scrollbar">
+      <div className="flex-1 px-5 pt-5 pb-4 overflow-y-auto no-scrollbar">
 
         {/* Item totals */}
         {itemTotals.length > 0 && (
@@ -154,7 +155,7 @@ export default function OrderSummary() {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white border-t border-stone-100 px-5 py-4 pb-safe space-y-2">
+      <div className="flex-shrink-0 bg-white border-t border-stone-100 px-5 py-4 pb-safe space-y-2">
         <div className="flex gap-3">
           <Button onClick={shareSummary} className="flex-1">
             Share Summary
@@ -163,7 +164,7 @@ export default function OrderSummary() {
             {copied ? '✓ Copied!' : 'Copy Text'}
           </Button>
         </div>
-        <Button variant="ghost" size="md" onClick={() => navigate(-1)} className="w-full text-stone-500">
+        <Button variant="ghost" size="md" onClick={() => navigate(`/groups/${groupId}`)} className="w-full text-stone-500">
           ← Back to Group
         </Button>
       </div>

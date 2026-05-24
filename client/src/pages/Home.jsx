@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useSocket } from '../contexts/SocketContext';
 import { api } from '../lib/api';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
@@ -14,7 +13,6 @@ const FOOD_EMOJIS = ['🍔', '🍕', '🌮', '🍜', '🥗', '☕', '🍱', '�
 
 export default function Home() {
   const { user, logout } = useAuth();
-  const { socket } = useSocket();
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +78,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col max-w-lg mx-auto">
+    <div className="h-[100dvh] bg-stone-50 flex flex-col max-w-lg mx-auto">
       {/* Header */}
       <div className="px-5 pt-12 pb-4 safe-top">
         <div className="flex items-center justify-between">
@@ -96,7 +94,7 @@ export default function Home() {
       <div className="flex-1 px-5 pb-safe overflow-y-auto no-scrollbar">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-3 border-orange-400 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
@@ -146,7 +144,7 @@ export default function Home() {
       </div>
 
       {/* Create Group Modal */}
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="New Group">
+      <Modal open={showCreate} onClose={() => { setShowCreate(false); setFormError(''); }} title="New Group">
         <form onSubmit={createGroup} className="flex flex-col gap-4 pt-3">
           <div>
             <p className="text-sm font-medium text-stone-700 mb-2">Pick an icon</p>
@@ -177,7 +175,7 @@ export default function Home() {
       </Modal>
 
       {/* Join Group Modal */}
-      <Modal open={showJoin} onClose={() => setShowJoin(false)} title="Join a Group">
+      <Modal open={showJoin} onClose={() => { setShowJoin(false); setFormError(''); }} title="Join a Group">
         <form onSubmit={joinGroup} className="flex flex-col gap-4 pt-3">
           <p className="text-stone-500 text-sm">Ask the group admin for their 6-character invite code.</p>
           <Input

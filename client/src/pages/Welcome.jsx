@@ -26,7 +26,13 @@ export default function Welcome() {
     setLoading(true);
     try {
       await login(username.trim(), email.trim());
-      navigate('/', { replace: true });
+      const pendingJoin = localStorage.getItem('tab_pending_join');
+      if (pendingJoin) {
+        localStorage.removeItem('tab_pending_join');
+        navigate(`/join/${pendingJoin}`, { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (e) {
       setError(e.message);
     } finally {
@@ -35,7 +41,7 @@ export default function Welcome() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-stone-50 flex flex-col items-center justify-center px-5">
+    <div className="h-[100dvh] bg-gradient-to-b from-orange-50 to-stone-50 flex flex-col items-center justify-center px-5">
       <div className="w-full max-w-sm animate-slide-up">
 
         {/* Logo */}

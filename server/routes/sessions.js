@@ -88,6 +88,7 @@ router.get('/:id', (req, res) => {
 router.get('/:id/summary', (req, res) => {
   const result = getSessionWithAccess(req.params.id, req.user.id);
   if (!result) return res.status(404).json({ error: 'Not found' });
+  if (result.session.status !== 'closed') return res.status(400).json({ error: 'Order is still in progress' });
   res.json(buildSummary(req.params.id));
 });
 
@@ -217,6 +218,10 @@ router.post('/:id/respond', (req, res) => {
 
   if (!response) {
     db.prepare('INSERT INTO user_responses (id, session_id, user_id, status) VALUES (?, ?, ?, ?)').run(responseId, session.id, req.user.id, 'pending');
+  }
+
+  if (!declined && (!items?.length || !items.some(i => i.quantity > 0))) {
+    return res.status(400).json({ error: 'Select at least one item' });
   }
 
   const status = declined ? 'declined' : 'responded';

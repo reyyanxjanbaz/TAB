@@ -27,12 +27,28 @@ export default function GroupDetail() {
   useEffect(() => {
     if (!socket || !data) return;
     socket.emit('join-group', id);
+    promptPushPermission();
 
     const onSessionStarted = ({ session }) => {
+      setData(prev => prev ? { ...prev, sessions: [session, ...prev.sessions] } : prev);
       navigate(`/sessions/${session.id}`);
     };
+    const onSessionClosed = ({ sessionId }) => {
+      setData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          sessions: prev.sessions.map(s => s.id === sessionId ? { ...s, status: 'closed' } : s),
+        };
+      });
+    };
+
     socket.on('session:started', onSessionStarted);
-    return () => socket.off('session:started', onSessionStarted);
+    socket.on('session:closed', onSessionClosed);
+    return () => {
+      socket.off('session:started', onSessionStarted);
+      socket.off('session:closed', onSessionClosed);
+    };
   }, [socket, data, id]);
 
   async function loadGroup() {
@@ -73,21 +89,20 @@ export default function GroupDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-orange-400 border-t-transparent rounded-full animate-spin" />
+      <div className="h-[100dvh] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!data) return null;
-  const { group, members, sessions, my_role } = data;
-  const isAdmin = my_role === 'admin';
-  const activeSession = sessions.find(s => s.status === 'active');
+  const { group, members, sessions } = data;
+  const activeSession = sessions.find(s => s.status === 'active' || s.status === 'setup');
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col max-w-lg mx-auto">
+    <div className="h-[100dvh] bg-stone-50 flex flex-col max-w-lg mx-auto">
       {/* Header */}
-      <div className="bg-white px-5 pt-12 pb-4 safe-top border-b border-stone-100">
+      <div className="bg-white px-5 pt-12 pb-4 safe-top border-b border-stone-100 flex-shrink-0">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate('/')} className="text-stone-400 text-xl p-1">←</button>
           <div className="flex items-center gap-3 flex-1">
@@ -112,16 +127,16 @@ export default function GroupDetail() {
 
       <div className="flex-1 px-5 pt-5 pb-safe overflow-y-auto no-scrollbar">
 
-        {/* Active session banner */}
+        {/* Active/setup session banner */}
         {activeSession && (
           <button
-            onClick={() => navigate(`/sessions/${activeSession.id}`)}
+            onClick={() => navigate(activeSession.status === 'active' ? `/sessions/${activeSession.id}` : `/sessions/${activeSession.id}/setup`)}
             className="w-full bg-orange-500 text-white rounded-2xl p-4 mb-4 flex items-center gap-3 animate-bounce-gentle"
           >
-            <span className="text-2xl">🔴</span>
+            <span className="text-2xl">{activeSession.status === 'active' ? '🔴' : '⏳'}</span>
             <div className="flex-1 text-left">
-              <p className="font-semibold">Order in progress!</p>
-              <p className="text-sm text-orange-100">Tap to join the order</p>
+              <p className="font-semibold">{activeSession.status === 'active' ? 'Order in progress!' : 'Order being set up...'}</p>
+              <p className="text-sm text-orange-100">Tap to {activeSession.status === 'active' ? 'join the order' : 'view setup'}</p>
             </div>
             <span className="text-xl">›</span>
           </button>
@@ -147,8 +162,16 @@ export default function GroupDetail() {
             {sessions.map(s => (
               <button
                 key={s.id}
-                onClick={() => navigate(s.status === 'active' ? `/sessions/${s.id}` : `/sessions/${s.id}/summary`)}
-                className="bg-white rounded-2xl p-4 text-left border border-stone-100 active:bg-stone-50 w-full"
+                onClick={() => {
+                  if (s.status === 'active') navigate(`/sessions/${s.id}`);
+                  else if (s.status === 'setup') {
+                    if (s.created_by === user.id) navigate(`/sessions/${s.id}/setup`);
+                  } else {
+                    navigate(`/sessions/${s.id}/summary`);
+                  }
+                }}
+                disabled={s.status === 'setup' && s.created_by !== user.id}
+                className="bg-white rounded-2xl p-4 text-left border border-stone-100 active:bg-stone-50 w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center justify-between">
                   <div>

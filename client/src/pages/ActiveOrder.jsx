@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
@@ -155,18 +155,18 @@ export default function ActiveOrder() {
   const isHost = session?.created_by === user?.id;
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-3 border-orange-400 border-t-transparent rounded-full animate-spin" />
+    return <div className="h-[100dvh] flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col max-w-lg mx-auto">
+    <div className="h-[100dvh] bg-stone-50 flex flex-col max-w-lg mx-auto">
       {/* Header */}
-      <div className="bg-white px-5 pt-12 pb-4 safe-top border-b border-stone-100">
+      <div className="bg-white px-5 pt-12 pb-4 safe-top border-b border-stone-100 flex-shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="text-stone-400 text-xl">←</button>
+            <button onClick={() => navigate(`/groups/${session?.group_id}`)} className="text-stone-400 text-xl">←</button>
             <div>
               <h1 className="text-lg font-bold text-stone-900">Live Order</h1>
               <p className="text-sm text-stone-500">{host?.username} is ordering</p>
@@ -201,7 +201,7 @@ export default function ActiveOrder() {
       </div>
 
       {/* Items */}
-      <div className="flex-1 px-5 pt-5 pb-40 overflow-y-auto no-scrollbar">
+      <div className="flex-1 px-5 pt-5 pb-4 overflow-y-auto no-scrollbar">
 
         {submitted && (
           <div className={cn(
@@ -310,31 +310,35 @@ export default function ActiveOrder() {
         )}
       </div>
 
-      {/* Footer actions */}
-      {!submitted && (
-        <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white border-t border-stone-100 px-5 py-4 pb-safe space-y-2">
+      {/* Footer */}
+      <div className="flex-shrink-0 bg-white border-t border-stone-100 px-5 py-4 pb-safe space-y-2">
+        {!submitted && (
+          <>
+            <Button
+              size="lg"
+              onClick={submitOrder}
+              loading={submitting}
+              disabled={!hasSelections}
+            >
+              Submit Order {hasSelections && `(${Object.values(quantities).reduce((a, b) => a + b, 0)} items)`}
+            </Button>
+            <Button size="lg" variant="ghost" onClick={submitDecline} disabled={submitting}>
+              I don't want anything
+            </Button>
+          </>
+        )}
+        {isHost && session?.status === 'active' && (
           <Button
             size="lg"
-            onClick={submitOrder}
-            loading={submitting}
-            disabled={!hasSelections}
+            variant="danger"
+            onClick={closeOrder}
+            loading={closing}
+            className="w-full"
           >
-            Submit Order {hasSelections && `(${Object.values(quantities).reduce((a, b) => a + b, 0)} items)`}
-          </Button>
-          <Button size="lg" variant="ghost" onClick={submitDecline} disabled={submitting}>
-            I don't want anything
-          </Button>
-        </div>
-      )}
-
-      {isHost && session?.status === 'active' && (
-        <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white border-t border-stone-100 px-5 pt-2 pb-safe">
-          {!submitted && <div className="mb-2" />}
-          <Button size="lg" variant={submitted ? 'danger' : 'outline'} onClick={closeOrder} loading={closing} className="w-full">
             Close Order Now
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
