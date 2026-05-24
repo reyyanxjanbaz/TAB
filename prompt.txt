@@ -1,0 +1,260 @@
+
+
+Build a complete production-ready web app from start to finish.
+
+This should be a mobile-first Progressive Web App (PWA), not a native mobile app.
+
+The app must work beautifully on both Android and iPhone directly from the browser, while also allowing users to:
+- “Add to Home Screen”
+- launch it like a real app
+- receive push notifications
+- use it in a full-screen app-like experience
+
+The goal is to avoid needing separate Android and iOS apps while still feeling like a polished native application.
+
+The app should be:
+- extremely lightweight
+- very fast
+- smooth on low-end devices
+- optimized for mobile usage
+- simple and human-centered
+
+--------------------------------------------------
+CORE IDEA
+--------------------------------------------------
+
+The app solves one specific problem:
+
+When one person is ordering food/snacks/drinks for a group, collecting everyone’s orders in chats becomes messy and annoying.
+
+This app should make the entire process:
+- fast
+- frictionless
+- organized
+- effortless
+
+Do NOT overcomplicate the product.
+Do NOT add unnecessary AI features.
+Do NOT turn this into a food delivery platform.
+
+Keep the experience minimal and focused.
+
+--------------------------------------------------
+CORE FUNCTIONALITY
+--------------------------------------------------
+
+1. GROUP CREATION
+
+Users can:
+- create groups
+- set group name
+- optionally upload group icon
+- invite others using:
+ - unique code
+ - share link
+
+Examples:
+- Hostel Friends
+- Office Team
+- Flatmates
+- Family
+
+Joining a group should take only a few seconds.
+
+--------------------------------------------------
+2. START ORDER SESSION
+
+Inside a group, users can press:
+“Start Order”
+
+The host can:
+- add items manually
+- optionally add prices
+- edit/remove items
+- set response timer
+
+Example items:
+- Burger
+- Fries
+- Pizza
+- Shawarma
+- Coffee
+
+The UI for adding items should be extremely fast and simple.
+
+--------------------------------------------------
+3. REAL-TIME NOTIFICATIONS
+
+When an order starts:
+- all group members receive push notifications
+
+Examples:
+“Reyyan started an order 🍔”
+
+Users should also receive:
+- reminder before timer ends
+- order closed notification
+
+Notifications should feel clean and non-spammy.
+
+--------------------------------------------------
+4. ORDERING FLOW
+
+Users can:
+- select items
+- change quantity
+- add optional notes
+
+There MUST be a very clear option:
+“I don’t want anything”
+
+This is important because users should be able to respond without ignoring the order.
+
+The entire ordering process should take only a few seconds.
+
+--------------------------------------------------
+5. TIMER SYSTEM
+
+Host can set:
+- 1 minute
+- 5 minutes
+- 10 minutes
+- custom duration
+
+Users can edit their responses until timer ends.
+
+When timer ends:
+- submissions lock automatically
+- order closes in realtime for everyone
+
+--------------------------------------------------
+6. ORDER SUMMARY
+
+After order closes:
+generate a clean summary page.
+
+Show:
+- item totals
+- quantities
+- who ordered what
+- declined users
+
+The host should be able to:
+- copy summary
+- share summary
+- export summary as image
+
+--------------------------------------------------
+7. ORDER HISTORY
+
+Groups should keep previous order sessions.
+
+Users should be able to:
+- reopen previous sessions
+- duplicate previous item lists
+
+--------------------------------------------------
+DESIGN REQUIREMENTS
+--------------------------------------------------
+
+This app must be designed with extreme focus on human-centered UX.
+
+The experience should feel:
+- effortless
+- obvious
+- calming
+- modern
+- lightweight
+
+The interface should:
+- prioritize one-handed use
+- use large touch-friendly buttons
+- minimize typing
+- minimize taps
+- avoid clutter
+- avoid complex navigation
+
+Avoid:
+- enterprise dashboard feeling
+- unnecessary settings
+- bloated UI
+- feature overload
+
+The app should feel similar to:
+- WhatsApp simplicity
+- Apple-level smoothness
+- modern minimal mobile apps
+
+Use:
+- soft rounded corners
+- clean typography
+- subtle animations
+- smooth transitions
+- modern spacing
+- responsive mobile layouts
+
+--------------------------------------------------
+PWA REQUIREMENTS
+--------------------------------------------------
+
+This is EXTREMELY IMPORTANT.
+
+The app must function as a true Progressive Web App.
+
+Implement:
+- installable “Add to Home Screen”
+- responsive mobile layouts
+- offline-friendly behavior where possible
+- app icon and splash screen
+- standalone app mode
+- push notifications
+- fast loading and caching
+- smooth performance on mobile browsers
+
+The app should feel almost indistinguishable from a native app.
+
+--------------------------------------------------
+TECHNICAL REQUIREMENTS
+--------------------------------------------------
+
+Build the complete app including:
+- frontend
+- backend
+- database
+- authentication
+- realtime syncing
+- push notifications
+- PWA support
+
+Generate:
+- complete architecture
+- database schema
+- API structure
+- folder structure
+- onboarding flow
+- UI screens
+- loading states
+- empty states
+- error handling
+- edge cases
+
+The app should be production-ready and scalable.
+
+--------------------------------------------------
+IMPORTANT UX THINKING
+--------------------------------------------------
+
+Think deeply about:
+- reducing friction
+- reducing chaos in group chats
+- making responses quick
+- reducing social awkwardness
+- making interactions effortless
+
+Every screen should answer:
+“How can this be made faster and simpler?”
+
+The app should feel:
+instant, lightweight, and incredibly easy to use.
+
+the app should be called TAB
