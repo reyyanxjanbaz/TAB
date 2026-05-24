@@ -93,6 +93,25 @@ function initDB() {
       FOREIGN KEY (response_id) REFERENCES user_responses(id) ON DELETE CASCADE,
       FOREIGN KEY (item_id) REFERENCES session_items(id)
     );
+
+    CREATE TABLE IF NOT EXISTS group_saved_lists (
+      id TEXT PRIMARY KEY,
+      group_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      created_by TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+      FOREIGN KEY (created_by) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS group_saved_list_items (
+      id TEXT PRIMARY KEY,
+      list_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      price REAL,
+      sort_order INTEGER DEFAULT 0,
+      FOREIGN KEY (list_id) REFERENCES group_saved_lists(id) ON DELETE CASCADE
+    );
   `);
   console.log('✓ Database ready');
 }

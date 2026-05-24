@@ -38,6 +38,9 @@ export const api = {
   getGroup: (id) => request('GET', `/groups/${id}`),
   updateGroup: (id, body) => request('PUT', `/groups/${id}`, body),
   kickMember: (groupId, userId) => request('DELETE', `/groups/${groupId}/members/${userId}`),
+  getSavedLists: (groupId) => request('GET', `/groups/${groupId}/lists`),
+  createSavedList: (groupId, body) => request('POST', `/groups/${groupId}/lists`, body),
+  deleteSavedList: (groupId, listId) => request('DELETE', `/groups/${groupId}/lists/${listId}`),
   createSession: (groupId) => request('POST', `/groups/${groupId}/sessions`),
 
   // Sessions

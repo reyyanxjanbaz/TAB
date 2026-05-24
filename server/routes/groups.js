@@ -162,4 +162,61 @@ router.post('/:id/sessions', (req, res) => {
   res.status(201).json({ session });
 });
 
+// Get saved lists for a group
+router.get('/:id/lists', (req, res) => {
+  const db = getDB();
+  const member = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  if (!member) return res.status(403).json({ error: 'Not a member' });
+
+  const lists = db.prepare(`
+    SELECT gl.*, u.username as creator_name
+    FROM group_saved_lists gl JOIN users u ON gl.created_by = u.id
+    WHERE gl.group_id = ? ORDER BY gl.created_at DESC
+  `).all(req.params.id);
+
+  const listsWithItems = lists.map(list => {
+    const items = db.prepare('SELECT * FROM group_saved_list_items WHERE list_id = ? ORDER BY sort_order').all(list.id);
+    return { ...list, items };
+  });
+  res.json({ lists: listsWithItems });
+});
+
+// Create a saved list
+router.post('/:id/lists', (req, res) => {
+  const db = getDB();
+  const member = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  if (!member) return res.status(403).json({ error: 'Not a member' });
+
+  const { name, items } = req.body;
+  if (!name?.trim()) return res.status(400).json({ error: 'List name required' });
+  if (!items?.length) return res.status(400).json({ error: 'Add at least one item' });
+
+  const listId = uuidv4();
+  db.prepare('INSERT INTO group_saved_lists (id, group_id, name, created_by) VALUES (?, ?, ?, ?)').run(listId, req.params.id, name.trim(), req.user.id);
+
+  const insertItem = db.prepare('INSERT INTO group_saved_list_items (id, list_id, name, price, sort_order) VALUES (?, ?, ?, ?, ?)');
+  items.forEach((item, i) => insertItem.run(uuidv4(), listId, item.name, item.price || null, i));
+
+  const list = db.prepare('SELECT * FROM group_saved_lists WHERE id = ?').get(listId);
+  const savedItems = db.prepare('SELECT * FROM group_saved_list_items WHERE list_id = ? ORDER BY sort_order').all(listId);
+  res.status(201).json({ list: { ...list, items: savedItems } });
+});
+
+// Delete a saved list
+router.delete('/:id/lists/:listId', (req, res) => {
+  const db = getDB();
+  const member = db.prepare('SELECT * FROM group_members WHERE group_id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  if (!member) return res.status(403).json({ error: 'Not a member' });
+
+  const list = db.prepare('SELECT * FROM group_saved_lists WHERE id = ? AND group_id = ?').get(req.params.listId, req.params.id);
+  if (!list) return res.status(404).json({ error: 'List not found' });
+
+  if (list.created_by !== req.user.id && member.role !== 'admin') {
+    return res.status(403).json({ error: 'Only the creator or admin can delete this list' });
+  }
+
+  db.prepare('DELETE FROM group_saved_lists WHERE id = ?').run(req.params.listId);
+  res.json({ ok: true });
+});
+
 module.exports = router;
