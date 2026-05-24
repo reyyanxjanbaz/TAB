@@ -41,7 +41,7 @@ export default function Welcome() {
   }
 
   return (
-    <div className="h-[100dvh] bg-gradient-to-b from-orange-50 to-stone-50 flex flex-col items-center justify-center px-5">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-orange-50 to-stone-50 flex flex-col items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm animate-slide-up">
 
         {/* Logo */}
